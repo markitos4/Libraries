@@ -649,7 +649,7 @@ function DrawingLib.createFrame()
 end
 
 task.spawn(function()
-	print("Xeno Discord server: discord.gg/getxeno")
+	print("Credits to discord.gg/getxeno :3")
 end)
 
 function DrawingLib.createScreenGui()
