@@ -82,7 +82,7 @@ function library:CreateWindow(name, size, hidebutton)
 		window.theme = (theme or library.theme)
 	end
 
-	window.Main = Instance.new("ScreenGui", coregui)
+	window.Main = Instance.new("ScreenGui", gethui and gethui() or coregui)
 	window.Main.Name = "RobloxGui"
 	window.Main.DisplayOrder = 15
 
@@ -132,17 +132,6 @@ function library:CreateWindow(name, size, hidebutton)
 			window.Frame.Visible = not window.Frame.Visible
 		end
 	end)
-
-	local function checkIfGuiInFront(Pos)
-		local objects = coregui:GetGuiObjectsAtPosition(Pos.X, Pos.Y)
-		for i, v in next, (objects) do
-			if not string.find(v:GetFullName(), window.name) then
-				table.remove(objects, i)
-			end
-		end
-
-		return(#objects ~= 0 and objects[1].AbsolutePosition ~= Pos)
-	end
 
 	window.BlackOutline = Instance.new("Frame", window.Frame)
 	window.BlackOutline.Name = "outline"
@@ -3406,7 +3395,7 @@ function library:CreateWatermark(name, position)
 	watermark.Visible = true
 	watermark.text = " " .. name:gsub("{game}", gamename):gsub("{fps}", "0 FPS") .. " "
 
-	watermark.main = Instance.new("ScreenGui", coregui)
+	watermark.main = Instance.new("ScreenGui", gethui and gethui() or coregui)
 	watermark.main.Name = "RobloxGui"
 
 	watermark.mainbar = Instance.new("Frame", watermark.main)
