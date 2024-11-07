@@ -1,6 +1,6 @@
 --!strict
 -- metatablecat 2022
--- CREDITS TO XENO LZ4 LIBRARY
+
 local lz4 = {}
 
 type Streamer = {
