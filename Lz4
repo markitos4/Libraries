@@ -223,65 +223,42 @@ function lz4.compress(str: string): string
 	return string.pack("<I4", compLen) .. string.pack("<I4", decompLen) .. output
 end
 
-function lz4.decompress(lz4data: string): string
-	local inputStream = streamer(lz4data)
+function lz4.decompress(lz4data: string, size: number): string
+    local out, i, dataLen = {}, 1, #lz4data
 
-	local compressedLen = string.unpack("<I4", inputStream:read(4))
-	local decompressedLen = string.unpack("<I4", inputStream:read(4))
-	local reserved = string.unpack("<I4", inputStream:read(4))
+    while i <= dataLen and #table.concat(out) < size do
+        local token = lz4data:byte(i)
+        i = i + 1
 
-	if compressedLen == 0 then
-		return inputStream:read(decompressedLen)
-	end
+        if token == 0 then
+            -- Leer dist y len con unpack
+            local dist, len = string.unpack(">I2I2", lz4data:sub(i, i + 3))
+            i = i + 4
 
-	local outputStream = streamer("")
+            dist = dist + 1
+            len = len + 4
 
-	repeat
-		local token = string.byte(inputStream:read())
-		local litLen = bit32.rshift(token, 4)
-		local matLen = bit32.band(token, 15) + 4
+            -- Determinar la posición de inicio del "match" basado en la distancia
+            local start = #table.concat(out) - dist + 1
+            local match = table.concat(out):sub(start, start + len - 1)
 
-		if litLen >= 15 then
-			repeat
-				local nextByte = string.byte(inputStream:read())
-				litLen += nextByte
-			until nextByte ~= 0xFF
-		end
+            -- Asegurar que el "match" tenga la longitud correcta
+            while #match < len do
+                match = match .. match
+            end
 
-		local literal = inputStream:read(litLen)
-		outputStream:append(literal)
-		outputStream:toEnd()
-		if outputStream.Length < decompressedLen then
-			--match
-			local offset = string.unpack("<I2", inputStream:read(2))
-			if matLen >= 19 then
-				repeat
-					local nextByte = string.byte(inputStream:read())
-					matLen += nextByte
-				until nextByte ~= 0xFF
-			end
+            -- Insertar el "match" en la salida
+            table.insert(out, match:sub(1, len))
+        else
+            -- Agregar los datos sin comprimir
+            table.insert(out, lz4data:sub(i, i + token - 1))
+            i = i + token
+        end
+    end
 
-			outputStream:seek(-offset)
-			local pos = outputStream.Offset
-			local match = outputStream:read(matLen)
-			local unreadBytes = outputStream.LastUnreadBytes
-			local extra
-			if unreadBytes then
-				repeat
-					outputStream.Offset = pos
-					extra = outputStream:read(unreadBytes)
-					unreadBytes = outputStream.LastUnreadBytes
-					match ..= extra
-				until unreadBytes <= 0
-			end
-
-			outputStream:append(match)
-			outputStream:toEnd()
-		end
-
-	until outputStream.Length >= decompressedLen
-
-	return outputStream.Source
+    -- Retornar la cadena descomprimida, recortada al tamaño solicitado
+    return table.concat(out):sub(1, size)
 end
+
 
 return lz4
