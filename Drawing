@@ -1,7 +1,7 @@
 
 local _Camera = workspace.CurrentCamera
 	
-_DrawingContainer = Instance.new("ScreenGui", game:GetService("CoreGui"))
+_DrawingContainer = Instance.new("ScreenGui")
 _DrawingContainer.Name = "DrawingLibrary"
 _DrawingContainer.IgnoreGuiInset = true
 _DrawingContainer.DisplayOrder = 0x7fffffff
@@ -748,5 +748,6 @@ getgenv().setrenderproperty = function(object, property, value)
 end
 
 do
+	_DrawingContainer.Parent = gethui()
 	getgenv().Drawing = _Drawing
 end
