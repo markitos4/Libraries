@@ -941,7 +941,7 @@ new = function(drawingType)
 end
 }
 
-getgenv().isrenderobj(drawingObj)
+getgenv().isrenderobj = function(drawingObj)
 	local success, isrenderobj = pcall(function()
 		return drawingObj.Parent == drawingUI
 	end)
