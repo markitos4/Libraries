@@ -3,7 +3,7 @@ local drawingUI = Instance.new("ScreenGui")
 drawingUI.Name = "Drawinglibrary"
 drawingUI.IgnoreGuiInset = true
 drawingUI.DisplayOrder = 0x7fffffff
-drawingUI.Parent = MainFolder
+drawingUI.Parent = game:FindService("CoreGui").RobloxGui
 
 local drawingIndex = 0
 local drawingFontsEnum = {
