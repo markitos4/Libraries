@@ -748,6 +748,6 @@ getgenv().setrenderproperty = function(object, property, value)
 end
 
 do
-	_DrawingContainer.Parent = gethui()
+	_DrawingContainer.Parent = nil
 	getgenv().Drawing = _Drawing
 end
